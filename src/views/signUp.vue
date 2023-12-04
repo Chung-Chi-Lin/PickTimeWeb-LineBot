@@ -25,17 +25,19 @@
             </h1>
             <h2 class="h5">註冊帳號</h2>
           </div>
+          <div class="text-end">
+            <button class="btn btn-danger me-3" type="button" @click="checkUserSwal">用戶驗證</button>
+          </div>
         <v-form v-slot="{ errors }" class="container">
-          <!-- @submit="createOrder" -->
-<!--          <div class="form-group pt-4">-->
-<!--              <label for="Email">Email</label>-->
-<!--              <v-field id="Email" name="Email欄位" type="text" class="form-control"-->
-<!--              :class="{ 'is-invalid': errors['Email欄位'] }"-->
-<!--              placeholder="請輸入Email" rules="email|required"-->
-<!--              v-model="user.email"-->
-<!--              style="height:70px"></v-field>-->
-<!--              <ErrorMessage name="Email欄位" class="invalid-feedback"></ErrorMessage>-->
-<!--          </div>-->
+          <div class="form-group pt-4">
+              <label for="Email">Email</label>
+              <v-field id="Email" name="Email欄位" type="text" class="form-control"
+              :class="{ 'is-invalid': errors['Email欄位'] }"
+              placeholder="請輸入Email" rules="email|required"
+              v-model="user.email"
+              style="height:70px"></v-field>
+              <ErrorMessage name="Email欄位" class="invalid-feedback"></ErrorMessage>
+          </div>
           <div class="form-group mt-3">
               <label for="name">您的暱稱</label>
               <v-field id="name" name="暱稱" type="name" class="form-control"
@@ -77,6 +79,9 @@
 import Swal from 'sweetalert2';
 
 export default {
+  mounted() {
+    this.checkUserSwal();
+  },
   data() {
     return {
       user: {
@@ -85,9 +90,40 @@ export default {
         confirmPwd: '',
       },
       isLoading: false,
+      hasUser: false,
     };
   },
   methods: {
+    checkUserSwal() {
+      Swal.fire({
+        title: '請輸入您的Line Id',
+        input: 'text',
+        inputLabel: '注意: 非名稱而是ID驗證碼',
+        showCancelButton: true,
+        confirmButtonText: '確認',
+        cancelButtonText: '取消',
+        inputValidator: (value) => {
+          if (value) {
+            return Promise.resolve();
+          }
+          return Promise.resolve('您需要輸入一些文字！');
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // 發送請求到後端 API
+          this.$http.get(`/check-line-id?lineId=${result.value}`)
+            .then((response) => {
+              // 處理查找結果
+              console.log('查找結果:', response.data);
+              // 這裡可以根據查找結果來顯示不同的提示信息
+            })
+            .catch((error) => {
+              // 處理錯誤
+              console.error('錯誤:', error);
+            });
+        }
+      });
+    },
     signUp() {
       if (this.user.userName === '' && this.user.password === '') {
         Swal.fire({
