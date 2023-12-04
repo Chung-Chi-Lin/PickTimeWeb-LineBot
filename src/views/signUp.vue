@@ -12,7 +12,7 @@
       <div class="col-6 me-5 d-none d-md-block align-self-center">
         <h1 class="f-Baloo fw-bold h2 ps-3">
           <img src="../assets/check.png" alt="checkbox" style="height:55px">
-          ONLINE TODO LIST
+          LineBot Pick Time
         </h1>
         <img src="../assets/img.png" class="img-fluid" alt="todoMan">
       </div>

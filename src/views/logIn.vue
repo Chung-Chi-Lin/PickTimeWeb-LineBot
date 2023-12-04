@@ -12,12 +12,12 @@
       <div class="col-6 me-5 d-none d-md-block">
         <h1 class="f-Baloo fw-bold h2 ps-3">
           <img src="../assets/check.png" alt="checkbox" style="height:55px">
-          ONLINE TODO LIST
+          LineBot Pick Time
         </h1>
         <img src="../assets/img.png" class="img-fluid " alt="todoMan">
       </div>
       <div class="col">
-        <h2 class="mt-5 h3 d-none d-md-block ps-2">最實用的線上待辦事項服務</h2>
+        <h2 class="mt-5 h3 d-none d-md-block ps-2">提供共乘時間選擇服務</h2>
         <div class="text-center d-inline d-md-none">
           <h1 class="f-Baloo fw-bold">
             <img src="../assets/check.png" alt="checkbox">
