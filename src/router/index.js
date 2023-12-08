@@ -12,9 +12,9 @@ const routes = [
     component: () => import('../views/signUp.vue'),
   },
   {
-    path: '/todoList',
-    name: 'todoList',
-    component: () => import('../views/todoList.vue'),
+    path: '/rideShare',
+    name: 'rideShare',
+    component: () => import('../views/rideShare.vue'),
     props: (route) => route.params,
   },
 ];

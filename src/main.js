@@ -3,7 +3,7 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
-
+import moment from 'moment';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import {
   Form, Field, ErrorMessage, defineRule, configure,
@@ -14,12 +14,14 @@ import zhTW from '@vee-validate/i18n/dist/locale/zh_TW.json';
 import App from './App.vue';
 import router from './router';
 import { currency, date } from './methods/filters';
+import store from './store'; // 引入 Vuex store
 
 const app = createApp(App);
 // 註冊全域 千分號、日期
 app.config.globalProperties.$filters = {
   currency, date,
 };
+app.config.globalProperties.$moment = moment;
 // vee-validate-rule
 Object.keys(AllRules).forEach((rule) => {
   defineRule(rule, AllRules[rule]);
@@ -41,6 +43,7 @@ setLocale('zh_TW');
 
 app.use(VueAxios, axios);
 app.use(router);
+app.use(store); // 使用 Vuex store
 // 自訂 loading 樣式導入
 
 app.component('loading', Loading);

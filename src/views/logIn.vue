@@ -64,37 +64,37 @@ export default {
         email: '',
         password: '',
       },
-      token: '',
       isLoading: false,
     };
   },
   methods: {
     logIn() {
-      const url = `${process.env.VUE_APP_API}/users/sign_in`;
+      const url = `${process.env.VUE_APP_API}/users/login`;
       const data = {
-        user: {
-          email: this.user.email,
-          password: this.user.password,
-        },
+        email: this.user.email,
+        password: this.user.password,
       };
       this.isLoading = true;
       this.$http.post(url, data)
         .then((response) => {
-          this.token = response.headers.authorization;
+          const { token } = response.data;
+          // 將 token 儲存到 Vuex 和 localStorage
+          this.$store.dispatch('saveToken', token);
+          this.$store.dispatch('saveUserInfo', response.data.userInfo);
+          localStorage.setItem('token', token);
+
+          // 設置 axios 的默認授權頭部
+          this.$http.defaults.headers.common.Authorization = `Bearer ${token}`;
           this.isLoading = false;
-          this.$router.push({
-            path: '/todolist',
-            query: {
-              id: response.headers.authorization, // 傳送後會轉為字串
-              nickname: response.data.nickname,
-            },
-          });
+
+          // 導航到 rideShare 頁面
+          this.$router.push('/rideShare');
         })
         .catch((err) => {
           this.isLoading = false;
           Swal.fire({
-            title: err.response.data.message,
-            text: '如需註冊請點選帳號註冊，或重試帳號密碼',
+            title: '登入失敗',
+            text: err.response.data.message || '登入時發生錯誤，請重試。',
             icon: 'error',
             confirmButtonText: '了解',
           });

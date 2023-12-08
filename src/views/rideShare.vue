@@ -10,9 +10,9 @@
     </loading>
     <div class="d-none d-md-block">
       <header class="m-4 d-flex justify-content-between">
-        <h1 class="f-Baloo fw-bold h2 ps-3">
+        <h1 class="fw-bold h2 ps-3">
           <img src="../assets/check.png" alt="checkbox" style="height:55px">
-          ONLINE TODO LIST
+          {{ userInfo.userType?? "" + " " + userInfo.userName??"" + " 的共乘服務" }}
         </h1>
         <div class="d-flex align-items-center">
           <h2 class="h3 pe-3">{{ user }}</h2>
@@ -24,27 +24,27 @@
     <header class="m-3 d-flex justify-content-between d-md-none">
       <h1 class="f-Baloo fw-bold pt-2 h5">
         <img src="../assets/check-s.png" alt="checkbox">
-        ONLINE TODO LIST
+        {{ userInfo.userType?? "" + " " + userInfo.userName??"" + " 的共乘服務" }}
       </h1>
       <div class="d-flex align-items-center">
         <button class=" btn btn-sm btn-h" @click="signOut">登出</button>
       </div>
     </header>
     <main class="container pb-5">
-      <div class="input-group mb-4">
-        <input v-model="todoAdd" type="text"
-          class="form-control border-0" placeholder="新增待辦事項" id="todo">
-        <label class="input-group-text bg-white border-0" for="todo" style="height:60px">
-          <button class="btn btn-sm" @click="addTodo"
-          type="button" id="button-addon2">
-            <i class="bi bi-plus-square-fill fs-2"></i>
-          </button>
-        </label>
-      </div>
-      <div v-if="!token" class="row row-cols-1 d-flex justify-content-center my-5">
-        <h3 class="col text-center">目前尚無待辦資料</h3>
-        <img class="img-fluid col-4 " src="../assets/empty.png" alt="">
-      </div>
+<!--      <div class="input-group mb-4">-->
+<!--        <input v-model="todoAdd" type="text"-->
+<!--          class="form-control border-0" placeholder="新增待辦事項" id="todo">-->
+<!--        <label class="input-group-text bg-white border-0" for="todo" style="height:60px">-->
+<!--          <button class="btn btn-sm" @click="addTodo"-->
+<!--          type="button" id="button-addon2">-->
+<!--            <i class="bi bi-plus-square-fill fs-2"></i>-->
+<!--          </button>-->
+<!--        </label>-->
+<!--      </div>-->
+<!--      <div v-if="!token" class="row row-cols-1 d-flex justify-content-center my-5">-->
+<!--        <h3 class="col text-center">目前尚無待辦資料</h3>-->
+<!--        <img class="img-fluid col-4 " src="../assets/empty.png" alt="">-->
+<!--      </div>-->
       <!-- todo card -->
       <div class="card text-center">
         <div class="card-header bg-transparent">
@@ -59,31 +59,43 @@
         </div>
         <div class="card-body">
           <ul class="list-group list-group-flush text-start"
-            v-for="item in changeTodo" :key="item.id">
+            v-for="item in formattedFareData" :key="item.id">
+            <li class="list-group-item fs-5 d-flex justify-content-between">
+<!--              <span>-->
+<!--                <input class="form-check-input me-3 p-2"-->
+<!--                type="checkbox" :id="item.id" :value="item.content"-->
+<!--                :checked="item.completed_at !== null"-->
+<!--                @click="toggleTodo(item.id)"-->
+<!--                >-->
+<!--                <label class="form-check-label" :for="item.id"-->
+<!--                :class="{ 'text-decoration-line-through': item.completed_at !== null }">-->
+<!--                  {{ item.content }}-->
+<!--                </label>-->
+<!--              </span>-->
+<!--              <span>-->
+<!--                <button type="button" class="btn" @click="editTodo(item.id)">-->
+<!--                  <i class="bi bi-pencil-fill btn-li-h"></i></button>-->
+<!--                <button type="button" class="btn" @click="delTodo(item.id)">-->
+<!--                  <i class="bi bi-trash-fill btn-li-h"></i></button>-->
+<!--              </span>-->
+            </li>
             <li class="list-group-item fs-5 d-flex justify-content-between">
               <span>
-                <input class="form-check-input me-3 p-2"
-                type="checkbox" :id="item.id" :value="item.content"
-                :checked="item.completed_at !== null"
-                @click="toggleTodo(item.id)"
-                >
-                <label class="form-check-label" :for="item.id"
-                :class="{ 'text-decoration-line-through': item.completed_at !== null }">
-                  {{ item.content }}
+<!--                <input class="form-check-input me-3 p-2"-->
+<!--                type="checkbox" :id="item.id" :value="item.content"-->
+<!--                :checked="item.completed_at !== null"-->
+<!--                @click="toggleTodo(item.id)"-->
+<!--                >-->
+                <label class="form-check-label">
+                  紀錄日期:{{item.update_time}}, 費用:{{item.user_fare}}{{item.user_remark ? `, 原因:${item.user_remark}` : ""}}
                 </label>
-              </span>
-              <span>
-                <button type="button" class="btn" @click="editTodo(item.id)">
-                  <i class="bi bi-pencil-fill btn-li-h"></i></button>
-                <button type="button" class="btn" @click="delTodo(item.id)">
-                  <i class="bi bi-trash-fill btn-li-h"></i></button>
               </span>
             </li>
           </ul>
         </div>
         <div class="card-footer bg-transparent d-flex justify-content-between pt-3">
-          <p class="pt-3"><span class="fs-5">{{ todoList.length }}</span> {{ itemCountText }}</p>
-          <button type="button" class="btn border-0 btn-h" @click="clearAll">清除已完成項目</button>
+     <p class="pt-3"><span class="fs-5">{{ formattedFareData.length }}</span> 個車費紀錄</p>
+          <button type="button" class="btn border-0 btn-h">清除已完成項目</button>
         </div>
       </div>
     </main>
@@ -101,36 +113,54 @@
 </style>
 <script>
 import Swal from 'sweetalert2';
+import { mapGetters } from 'vuex';
 
 export default {
   data() {
     return {
-      todoList: [],
-      checked: [],
-      todoAdd: '',
+      formattedFareData: [],
+      fareData: [], // 儲存fare數據
+      fareCountData: [], // 儲存fareCount數據
       token: '',
       user: '',
       isLoading: false,
-      filteredType: '全部',
-      category: ['全部', '待完成', '已完成'],
+      filteredType: '當月',
+      category: ['當月', '上個月', '已完成'],
     };
   },
   methods: {
     // init
-    getData() {
-      this.isLoading = true;
-      const url = `${process.env.VUE_APP_API}/todos`;
-      this.$http.get(url, {
+    getFareData() {
+      const { email } = this.userInfo;
+      const { token } = this.$store.state;
+
+      const config = {
         headers: {
-          Authorization: this.token,
+          Authorization: `Bearer ${token}`,
         },
-      }).then((response) => {
-        this.todoList = [...response.data.todos];
-        this.isLoading = false;
-      }).catch((err) => {
-        console.log(err);
-        this.isLoading = false;
-      });
+      };
+
+      const data = {
+        email,
+      };
+
+      // Sending GET request
+      this.$http.post(`${process.env.VUE_APP_API}/fare/get_fare`, data, config)
+        .then((response) => {
+          const { found, message, fareData } = response.data;
+
+          if (found) {
+            this.fareData = fareData.fare; // fare data
+            this.fareCountData = fareData.fareCount; // fareCount data
+            console.log(this.fareData);
+            console.log(this.fareCountData);
+          } else {
+            console.log(message);
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
     },
     // 切換類別
     handleChangeCategory(type) {
@@ -201,7 +231,7 @@ export default {
             .catch((error) => {
               console.log(error);
               Swal.showValidationMessage(
-                '編輯失敗，請輸入待完成事項',
+                '編輯失敗，請輸入上個月事項',
               );
             });
         },
@@ -248,31 +278,36 @@ export default {
     },
     // 登出
     signOut() {
+      // 清除 Vuex 和 localStorage 中的令牌
+      this.$store.dispatch('clearAuthData');
+      localStorage.removeItem('token');
+
+      // 可選：向後端發送登出請求
+      // 如果您的後端需要撤銷令牌，請保留以下代碼
       const url = `${process.env.VUE_APP_API}/users/sign_out`;
-      this.isLoading = true;
-      this.$http.delete(url, {
-        headers: {
-          Authorization: this.token,
-        },
-      }).then((response) => {
-        this.$router.push('/');
-        this.isLoading = false;
-        Swal.fire({
-          title: response.data.message,
-          text: '登出成功',
-          icon: 'success',
-          confirmButtonText: '了解',
-        });
-      })
-        .catch((err) => {
-          this.isLoading = false;
+      this.$http.delete(url)
+        .then((response) => {
+          // 登出成功後的處理
           Swal.fire({
-            title: err.response.data.message,
-            text: '登出失敗',
+            title: '登出成功',
+            text: response.data.message,
+            icon: 'success',
+            confirmButtonText: '了解',
+          });
+        })
+        .catch((err) => {
+          // 登出失敗的處理
+          Swal.fire({
+            title: '登出失敗',
+            text: err.response.data.message,
             icon: 'error',
             confirmButtonText: '了解',
           });
         });
+
+      // 無論後端登出請求是否成功，都導航到登入頁面
+      this.$router.push('/login');
+      this.isLoading = false;
     },
     // 切換狀態
     toggleTodo(id) {
@@ -321,29 +356,38 @@ export default {
       });
     },
   },
-  computed: {
-    itemCountText() {
-      if (this.filteredType === '全部') {
-        return '個全部項目';
-      }
-      if (this.filteredType === '待完成') {
-        return '個待完成項目';
-      }
-      return '個已完成項目';
-    },
-    changeTodo() {
-      if (this.filteredType === '全部') {
-        return this.todoList;
-      } if (this.filteredType === '待完成') {
-        const toBeDone = this.todoList.filter((item) => item.completed_at === null);
-        return toBeDone;
-      }
-      const done = this.todoList.filter((item) => item.completed_at !== '' && item.completed_at !== null);
-      return done;
+  watch: {
+    filteredType: {
+      immediate: true,
+      handler(newValue) {
+        if (newValue === '當月') {
+          this.formattedFareData = this.fareData.map((item) => ({
+            ...item,
+            update_time: this.$moment(item.update_time).format('YYYY-MM-DD'),
+          }));
+        } else if (newValue === '上個月') {
+          this.formattedFareData = this.fareCountData.map((item) => ({
+            update_time: this.$moment(item.update_time).format('YYYY-MM-DD'),
+            user_fare: item.user_fare_count,
+            user_remark: item.user_remark,
+          }));
+        } else {
+          this.formattedFareData = this.fareCountData.map((item) => ({
+            update_time: this.$moment(item.update_time).format('YYYY-MM-DD'),
+            user_fare: item.user_fare_count,
+            user_remark: item.user_remark,
+          }));
+        }
+      },
     },
   },
+  computed: {
+    ...mapGetters({
+      userInfo: 'getUserInfo',
+    }),
+  },
   mounted() {
-    this.getData();
+    this.getFareData();
   },
   created() {
     this.token = this.$route.query.id;
